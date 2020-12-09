@@ -18,8 +18,16 @@ def solve_c9e6f938(x):
     x = np.array(new_xarr)
     return x
 
-#def solve_c1d99e64(x):
-#    return x
+def solve_c1d99e64(x):
+    new_xarr = x.copy()
+    rows = np.where(~new_xarr.any(axis=1))[0]
+    cols = np.where(~new_xarr.any(axis=0))[0]
+    for col in cols:
+        new_xarr[:,col] = 2
+    for row in rows:
+        new_xarr[row,:] = 2
+    x = new_xarr
+    return x
 
 #def solve_3631a71a(x):
 #    return x
