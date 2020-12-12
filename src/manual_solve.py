@@ -38,6 +38,49 @@ def solve_c1d99e64(x):
     return x
 '''All the training and test grids are solved correctly for Task ID c1d99e64'''
 
+'''Task ID 3631a71a Transformation Description - We have  an input grid which is combination of multiple colors (each cell has a number from 0 to 8).
+The issue with the input grid is that there are some blocks of cells having red color(9) which can be thought as broken tiles(9 numbered) on a wall of 
+some pattern. The transformation that we need to do to get our desired output is to replace those red block of cells with the most matching pattern in
+the grid. We need to check each row having those block of red cells and find a pattern in other rows which is closest to this row(ignoring red cells(9)).
+If we find a match then replace the row with the row having closest pattern. If no row match is found look at the columns which match a as done for rows to
+find a perfect match. There might be a scenario like in test grid where a row does not match with any row and after transposing a column does not match 
+with any column then for a row we can find a column which matches and vice versa'''
+def solve_3631a71a(x):
+    x_arr = x.copy()
+    def replace_rows(x_arr, x_arr_to_check):
+        for i, row in enumerate(x_arr): #Iterate each row of the grid to perform transformation
+            if 9 not in row: # Check whether the row consists of the 9 value and if not then the row need not be transformed.
+                continue
+            replacement = None
+            #If the row consists of 9 value
+            for j, row_to_check in enumerate(x_arr_to_check): # This for loop is for finding perfect matched row for the row having 9 value
+                if i != j and can_be_replaced(row, row_to_check): # Check the row that needs to be transformed is the not same row as we are
+                    # checking in same input grid and if not then pass the row to be transformed and the row to match to a function where it
+                    # checks if the row matches perfectly
+                    replacement = row_to_check
+            if replacement is None:
+                continue
+            x_arr[i] = replacement # Once the perfect row is found then replace with the row to be transformed
+        return x_arr
+    '''All the training and test grids are solved correctly for Task ID 3631a71a'''
+
+
+    def can_be_replaced(row_with_9s, row_to_check): # A function to check if two rows have same values in same positions apart from 9 for row to be transformed
+        for val1, val2 in zip(row_with_9s, row_to_check): # To check values at same position in both array
+            if val1 == 9: # If value in row to be transformed is 9 then ignore as we need to check non nine values
+                continue
+            if val1 != val2: # If any value at a particular position of row to be transformed does not match with the value at that position of the row
+                # check for matching then return False and this row cannot be used for replacement
+                return False
+        return True
+
+    x_arr = replace_rows(x_arr, x_arr) # Find if a row having block of red cells can replaced with any other row in the grid
+    x_arr = replace_rows(x_arr, x_arr.transpose()) # Find if a row having block of red cells can replaced with any other column in the grid
+    x_arr = replace_rows(x_arr.transpose(), x_arr.transpose()) # Find if a column having block of red cells can replaced with any other column in the grid
+    x_arr = x_arr.transpose()  # Transpose the final grid to get the output grid in the correct format
+    x = x_arr
+    return x
+'''All the training and test grids are solved correctly for Task ID 3631a71a'''
 
 def main():
     # Find all the functions defined in this file whose names are
