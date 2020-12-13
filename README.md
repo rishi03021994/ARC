@@ -79,3 +79,9 @@ Answers for above 4 tasks are:
 2. c1d99e64 - All unit cases in train and test grid completed successfully
 3. 3631a71a - All unit cases in train and test grid completed successfully
 4. ecdecbb3 - All unit cases in train and test grid completed successfully
+
+### Some Weakness or issues in ARC
+
+1. Generalization is not quantified and it does not offer to measure the difficulty of the task or the evaluation of the test set as can be seen in the 4 tasks implemented. We cannot decide between two tasks 3631a71a & ecdecbb3 which one is more difficult and there is no evaluation of test set.
+2. Test Validity is not established and for each task there is no surity that if all training cases passes successfully the test will also be successfull and this issue I faced in task 3631a71a where after writing the code all training cases ran successfully but test was failing for which I had to make proper changes.
+3. Dataset size and diversity are limited and this can be clearly seen as there are limited number of data sets available and among those datasets also many tasks are similar having same logics ffor transformation.
