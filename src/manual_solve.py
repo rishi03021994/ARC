@@ -11,6 +11,8 @@ import re
 ### examples below. Delete the three examples. The tasks you choose
 ### must be in the data/training directory, not data/evaluation.
 
+### In each tasks we  have grid and each cell has a number designated to it whihc corresponds to a color for example 0 represents black.
+
 '''Task ID c9e6f938 Transformation Description - We have an input 3x3 grid in the particular task and each cell has either Black(0) or Orange(7) color.
 The tranformation which is needed in this task to get desired output is to reshape the matrix to 3x6 and just take the mirror image on Y-axis of the 3x3 matrix to the right
 side of the Y-axis and concatenate the mirrored 3x3 matrix with original one which will result in 3x6 matrix.'''
@@ -21,7 +23,8 @@ def solve_c9e6f938(x):
         new_xarr.append(np.concatenate((train_x, rev_train_x), axis=0)) # Concatenate the original row with the reversed row using axis = 0 and append it into new list
     x = np.array(new_xarr) # Convert the list to numpy array
     return x
-'''All the training and test grids are solved correctly for Task ID c9e6f938'''
+	'''All the training and test grids are solved correctly for Task ID c9e6f938'''
+
 
 '''Task ID c1d99e64 Transformation Description - We have an input grid and the grid has two different colors either black(0) cell or any ther color.
 To tranform the grids in this task we need to find all rows and columns in grid whose all cells are black in color or have 0 in them and then 
@@ -36,7 +39,8 @@ def solve_c1d99e64(x):
         new_xarr[row,:] = 2 # Replace the all cells value with 2 in the particular row
     x = new_xarr
     return x
-'''All the training and test grids are solved correctly for Task ID c1d99e64'''
+	'''All the training and test grids are solved correctly for Task ID c1d99e64'''
+
 
 '''Task ID 3631a71a Transformation Description - We have  an input grid which is combination of multiple colors (each cell has a number from 0 to 8).
 The issue with the input grid is that there are some blocks of cells having red color(9) which can be thought as broken tiles(9 numbered) on a wall of 
@@ -62,8 +66,6 @@ def solve_3631a71a(x):
                 continue
             x_arr[i] = replacement # Once the perfect row is found then replace with the row to be transformed
         return x_arr
-    '''All the training and test grids are solved correctly for Task ID 3631a71a'''
-
 
     def can_be_replaced(row_with_9s, row_to_check): # A function to check if two rows have same values in same positions apart from 9 for row to be transformed
         for val1, val2 in zip(row_with_9s, row_to_check): # To check values at same position in both array
@@ -80,7 +82,60 @@ def solve_3631a71a(x):
     x_arr = x_arr.transpose()  # Transpose the final grid to get the output grid in the correct format
     x = x_arr
     return x
-'''All the training and test grids are solved correctly for Task ID 3631a71a'''
+	'''All the training and test grids are solved correctly for Task ID 3631a71a'''
+
+
+'''Task Id ecdecbb3 Transforamtion Description - We have an input grid in which each cell has either one of the three colors: Black(0), Dark orange(2) and 
+light blue(8). The input grid is such that there one or more cells with number 2 whose adjacent cells are black(0) as the background is black and there
+are some rows or columns in which all cells are light blue(8). In order to obtain the desired output we need to transform the input grid in such a way that 
+the cell numbered 2(orange) should replace the cell of the row or column having all cells light blue(8) which ever present in grid and also replace all the cells
+with orange which are in between the orange cell(2) and the row or column cell. For example if a cell i,j is orange and row k is complete blue then
+all rows between i and k should be changed to orange for column j. But the cells adjacent(including diagonal cells) to the cell in row or column which is replaced by 2, should be
+replaced by 8(blue). ANd the rows and columns which are closest to the orange cell in both directions should be used and not all rows and columns.'''
+def solve_ecdecbb3(x):
+    x_arr = x.copy()
+    rows_8 = [i for i, item in enumerate(np.all(x_arr == 8,axis=1)) if item] # Find all row numbers having all values equal to 8
+
+    def transform_x(x_arr,rows_8): # Function to perform the described transformation
+        rows_2 = [i for i, item in enumerate(np.any(x_arr == 2, axis=1)) if item] # Get all row numbers where rows have any cell value equal to 2
+
+        for row_2 in rows_2: # Iterate each row number having 2 in any cell
+            row = rows_8.copy()
+            row.append(row_2) # Append the row number having 2 value with the row numbers list having all values as 8
+            row.sort() # Sort the row having row numbers of row number having 2 and row numbers having all 8 in order to get the row numbers of 8 which are closest to row number 2 in both direction
+            idx = row.index(row_2) # Find the index of row number 2 in the sorted list
+            if (idx == 0): # If the row number of 2 is in the first index this means we need to find a row number of 8 below the row number 2 and that will be in index 1
+                idx_8 = [idx+1] # Store the index of row number of 8 closest to row number 2
+            elif (idx == len(row)-1):# If the row number of 2 is in the last index this means we need to find a row number of 8 just before the row number 2 and that will be second last index in sorted list
+                idx_8 = [idx-1]
+            else: # If the row number of 2 is not the first and last index then take the indexes of row numbers 8 index just before  and just after the index of row number 2
+                idx_8 = [idx-1,idx+1]
+            final_rows_8 = [row[i] for i in idx_8] # Get the rows numbers which are closest to row number 2 in both directions above and below
+            for final_row in final_rows_8: #Iterate each row number of 8 to perform transformation
+                col_2 = np.where(x_arr[row_2] == 2)[0][0] # Find the column number of the row number having 2 value
+                if row_2 < final_row: # If the row number having 2 value is above the row number having all values 8
+                    x_arr[final_row, col_2] = 2 # Replace the cell of row number having 8 and the column where row number is 2 with 2
+                    x_arr[row_2 + 1:final_row - 1, col_2] = 2 # Replace all cells from row number having 2 till 2 cells above the row number having 8
+                    x_arr[final_row + 1, col_2 - 1:col_2 + 2] = 8 # Replace the adjacent cells including diagonal cells of the first cell replaced with 2 of the 2nd last step bfore this
+                    x_arr[final_row - 1, col_2 - 1:col_2 + 2] = 8
+                else: # If the row number having 2 value is below the row number having all values 8 and the rest is same as in if condition
+                    x_arr[final_row, col_2] = 2
+                    x_arr[final_row + 1:row_2, col_2] = 2
+                    x_arr[final_row + 1, col_2 - 1:col_2 + 2] = 8
+                    x_arr[final_row - 1, col_2 - 1:col_2 + 2] = 8
+        return x_arr
+
+    if len(rows_8) != 0: # Check if any row is present whose all values are 8
+        x_arr = transform_x(x_arr,rows_8) # Pass to function to perform transformation as described
+    else: # If a column or columns are present whose all values are 8
+        x_arr = x_arr.transpose() # Transpose the grid as the transformation logic is written for row wise operations
+        rows_8 = [i for i, item in enumerate(np.all(x_arr == 8, axis=1)) if item] # after grid is transposed find the rows having all values 8(these are columns in original grid)
+        x_arr = transform_x(x_arr,rows_8) # Pass to function to perform transformation as described
+        x_arr = x_arr.transpose() # Transpose the grid returned after transforamtion to get original required grid format
+    x = x_arr
+    return x
+	'''All the training and test grids are solved correctly for Task ID ecdecbb3'''
+
 
 def main():
     # Find all the functions defined in this file whose names are
@@ -153,5 +208,29 @@ def show_result(x, y, yhat):
     # shape, then y == yhat is just a single bool.
     print(np.all(y == yhat))
 
-if __name__ == "__main__": main()
+if __name__ == "__main__":
+    # Short Summary on the Python features and libraries you used in the solve * functions and on any commonalities or differences among them
+    '''
+    The Python library used for each transformation task is numpy and some basic Python features used are simple if else conditions, for loops,
+    numpy data slicing, indexing, numpy array transpose, numpy where conditions, list comprehension, list slicing.
+    
+    Commonality between the task ids c9e6f938 and ecdecbb3 solve functions is background detection which is black in both cases. Difference
+    between these two ids are that c9e6f938 is a bi-colored grid and ecdecbb3 is tri-colored grid.
+    
+    Commonality between the task ids 3631a71a and ecdecbb3 solve functions is that in both tasks input grid needs to be transposed in order to obtain
+    desired output.
+    
+    Commonality between the task ids c1d99e64 and c1d99e64 solve functions is that in both tasks we find a row or column where all cells have a specific
+    value in order to obtain a desired output.
+    
+    Difference between task id c1d99e64 and task ids c9e6f938 and ecdecbb3 is that in task c1d99e64 the input grid is bi-colored and output grid is
+    tri-colored while in ids c9e6f938 and ecdecbb3 the number of colors remain same in input and output grid.
+    
+    Difference between task id c9e6f938 and all other task ids is that in task c9e6f938 the output grid shape is changed while in all other tasks the
+    output grid shape is same as input grid shape.
+    
+    Difference between task id c9e6f938 and all other task ids is that in task c9e6f938 there is not replacement of any cell in input grid in order to
+    obtain output grid but in other tasks a cell or cells are being replaced.
+    '''
+    main()
 
