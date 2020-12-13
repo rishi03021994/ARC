@@ -16,6 +16,15 @@ The `data` directory contains two subdirectories:
 - `data/training`: contains the task files for training (400 tasks). Use these to prototype your algorithm or to train your algorithm to acquire ARC-relevant cognitive priors.
 - `data/evaluation`: contains the task files for evaluation (400 tasks). Use these to evaluate your final algorithm. To ensure fair evaluation results, do not leak information from the evaluation set into your algorithm (e.g. by looking at the evaluation tasks yourself during development, or by repeatedly modifying an algorithm while using its evaluation score as feedback).
 
+To perform ARC tasks taken 4 tasks from training data to illustrate how we transform the input grid to output grid without using the output grid in solve_* function.
+
+Task Ids used for illustration are: 
+
+1. c9e6f938
+2. c1d99e64
+3. 3631a71a
+4. ecdecbb3
+
 The tasks are stored in JSON format. Each task JSON file contains a dictionary with two fields:
 
 - `"train"`: demonstration input/output pairs. It is a list of "pairs" (typically 3 pairs).
@@ -64,3 +73,9 @@ When your output grid is ready, click the green "Submit!" button to check your a
 After you've obtained the correct answer for the current test input grid, you can switch to the next test input grid for the task using the "Next test input" button (if there is any available; most tasks only have one test input).
 
 When you're done with a task, use the "load task" button to open a new task.
+
+Answers for above 4 tasks are:
+1. c9e6f938 - All unit cases in train and test grid completed successfully
+2. c1d99e64 - All unit cases in train and test grid completed successfully
+3. 3631a71a - All unit cases in train and test grid completed successfully
+4. ecdecbb3 - All unit cases in train and test grid completed successfully
